@@ -21,13 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingester.service
+package io.jrb.labs.ingester.messaging
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.jrb.labs.commons.eventbus.SystemEventBus
+import io.jrb.labs.commons.logging.LoggerDelegate
 import io.jrb.labs.commons.service.ControllableService
 import io.jrb.labs.datatypes.Rtl433Data
 import io.jrb.labs.ingester.data.Source
+import io.jrb.labs.ingester.datafill.IngesterDatafill
 import io.jrb.labs.messages.RawMessageSource
 import io.jrb.labs.messages.Rtl433Message
 import org.springframework.cloud.stream.function.StreamBridge
@@ -35,12 +37,15 @@ import org.springframework.stereotype.Service
 import reactor.core.Disposable
 
 @Service
-class IngestionService(
+class Rtl433Ingester(
     private val sources: List<Source>,
     private val objectMapper: ObjectMapper,
     private val streamBridge: StreamBridge,
+    private val datafill: IngesterDatafill,
     systemEventBus: SystemEventBus
 ): ControllableService(systemEventBus) {
+
+    private val log by LoggerDelegate()
 
     private val _subscriptions: MutableMap<String, Disposable?> = mutableMapOf()
 
@@ -49,14 +54,19 @@ class IngestionService(
             source.connect()
             _subscriptions[source.name] = source.subscribe(source.topic) { message ->
                 val rtl433Data = objectMapper.readValue(message, Rtl433Data::class.java)
-                streamBridge.send("dataEvents-out-0", Rtl433Message(source = RawMessageSource.RTL433, payload = rtl433Data))
+                streamBridge.send(
+                    datafill.outboundTopicBinding,
+                    Rtl433Message(source = RawMessageSource.RTL433, payload = rtl433Data)
+                ).let { status -> log.info("message - sent = $status, message - $rtl433Data") }
             }
         }
     }
 
     override fun onStop() {
         sources.forEach { source ->
-            _subscriptions.remove(source.name)
+            _subscriptions.remove(source.name).let { subscription ->
+                subscription?.dispose()
+            }
             source.disconnect()
         }
     }

@@ -25,6 +25,9 @@ management.info:
 logging.level:
   org.springframework: INFO
 
+application.ingester:
+  outbound-topic-binding: dataProducer-out-0
+
 spring.cloud.stream.bindings:
   dataProducer-out-0:
     destination: iot.data

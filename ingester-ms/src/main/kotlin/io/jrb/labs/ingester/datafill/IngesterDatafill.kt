@@ -27,5 +27,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "application.ingester")
 data class IngesterDatafill(
-    val mqtt: List<MqttSourceDatafill>
+    val mqtt: List<MqttSourceDatafill>,
+    val outboundTopicBinding: String
 )
