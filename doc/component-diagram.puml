@@ -1,0 +1,43 @@
+@startuml
+skinparam componentStyle rectangle
+
+package "MQTT" {
+  [rtl433-in] as mqtt
+}
+
+package "RabbitMQ" {
+  cloud "raw-message" <<topic>> as rme
+  queue "model-queue" as qmodel
+  queue "recommendation-queue" as qrecommend
+  queue "device-queue" as qdevice
+}
+
+database "MongoDB" {
+  storage "ModelEntity" as model
+  storage "AnomalyEntity" as anomaly
+  storage "KnownPatternEntity" as knownpattern
+  storage "RecommendationEntity" as recommendation
+}
+
+component "ingester-ms" as ims
+component "model-ms" as mms
+component "recommendation-ms" as rms
+component "device-ms" as dms
+
+mqtt --> ims
+ims --> rme
+rme -[dotted]-> qmodel
+rme -[dotted]-> qrecommend
+rme -[dotted]r-> qdevice
+
+qmodel --> mms
+mms --> model
+
+qrecommend --> rms
+rms --> anomaly
+rms --> knownpattern
+rms --> recommendation
+
+qdevice -r-> dms
+
+@enduml
