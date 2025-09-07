@@ -1,0 +1,139 @@
+services:
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:4.2.3-bionic
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    secrets:
+      - mongodb_username
+      - mongodb_password
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/mongodb_username
+      - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/mongodb_password
+    volumes:
+      - mongodb_data:/data/db
+    command: [--bind_ip_all]
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+      - 5672:5672
+      - 15672:15672
+    secrets:
+      - rabbitmq_admin_username
+      - rabbitmq_admin_password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/
+      - rabbitmq_logs:/var/log/rabbitmq
+      - ./rabbitmq/init-script.sh:/usr/local/bin/init-script.sh:ro
+    entrypoint: ["/usr/local/bin/init-script.sh"]
+    command: ["rabbitmq-server"]
+
+  ingester-ms:
+    container_name: ingester-ms
+    image: brulejr/ingester-ms:latest
+    ports:
+      - "3041:3041"
+    secrets:
+      - incoming_mqtt_host
+      - incoming_mqtt_port
+      - rabbitmq_client_username
+      - rabbitmq_client_password
+    environment:
+      PROFILE: "prod"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    volumes:
+      - ./ingester-ms/config:/config/app:ro
+      - ./ingester-ms/init-script.sh:/usr/local/bin/init-script.sh:ro
+    entrypoint: ["/usr/local/bin/init-script.sh"]
+
+  model-ms:
+    container_name: model-ms
+    image: brulejr/model-ms:latest
+    ports:
+      - "3042:3042"
+    secrets:
+      - mongodb_username
+      - mongodb_password
+      - rabbitmq_client_username
+      - rabbitmq_client_password
+    environment:
+      PROFILE: "prod"
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    volumes:
+      - ./model-ms/config:/config/app:ro
+      - ./model-ms/init-script.sh:/usr/local/bin/init-script.sh:ro
+    entrypoint: ["/usr/local/bin/init-script.sh"]
+
+  recommendation-ms:
+    container_name: recommendation-ms
+    image: brulejr/recommendation-ms:latest
+    ports:
+      - "3043:3043"
+    secrets:
+      - mongodb_username
+      - mongodb_password
+      - rabbitmq_client_username
+      - rabbitmq_client_password
+    environment:
+      PROFILE: "prod"
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    volumes:
+      - ./recommendation-ms/config:/config/app:ro
+      - ./recommendation-ms/init-script.sh:/usr/local/bin/init-script.sh:ro
+    entrypoint: ["/usr/local/bin/init-script.sh"]
+
+  device-ms:
+    container_name: device-ms
+    image: brulejr/device-ms:latest
+    ports:
+      - "3044:3044"
+    secrets:
+      - mongodb_username
+      - mongodb_password
+      - rabbitmq_client_username
+      - rabbitmq_client_password
+    environment:
+      PROFILE: "prod"
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    volumes:
+      - ./device-ms/config:/config/app:ro
+      - ./device-ms/init-script.sh:/usr/local/bin/init-script.sh:ro
+    entrypoint: ["/usr/local/bin/init-script.sh"]
+
+secrets:
+  incoming_mqtt_host:
+    file: secrets/incoming_mqtt_host.txt
+  incoming_mqtt_port:
+    file: secrets/incoming_mqtt_port.txt
+  mongodb_username:
+    file: secrets/mongodb_username.txt
+  mongodb_password:
+    file: secrets/mongodb_password.txt
+  rabbitmq_admin_username:
+    file: secrets/rabbitmq_admin_username.txt
+  rabbitmq_admin_password:
+    file: secrets/rabbitmq_admin_password.txt
+  rabbitmq_client_username:
+    file: secrets/rabbitmq_client_username.txt
+  rabbitmq_client_password:
+    file: secrets/rabbitmq_client_password.txt
+
+volumes:
+  mongodb_data:
+  rabbitmq_data:
+  rabbitmq_logs:
