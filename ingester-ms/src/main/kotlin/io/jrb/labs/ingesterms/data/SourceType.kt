@@ -21,13 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package io.jrb.labs.ingesterms.data
 
-package io.jrb.labs.ingester.datafill
-
-data class MqttSourceDatafill(
-    val name: String,
-    val host: String,
-    val port: Int,
-    val clientId: String,
-    val topic: String? = null
-)
+enum class SourceType {
+    MQTT
+}

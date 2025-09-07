@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingester.datafill
+package io.jrb.labs.ingesterms.datafill
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

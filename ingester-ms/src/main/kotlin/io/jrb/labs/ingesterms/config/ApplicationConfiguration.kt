@@ -21,13 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingester.config
+package io.jrb.labs.ingesterms.config
 
 import io.jrb.labs.commons.eventbus.SystemEventBus
 import io.jrb.labs.commons.eventbus.SystemEventLogger
-import io.jrb.labs.ingester.data.Source
-import io.jrb.labs.ingester.data.mqtt.HiveMqttSource
-import io.jrb.labs.ingester.datafill.IngesterDatafill
+import io.jrb.labs.ingesterms.data.Source
+import io.jrb.labs.ingesterms.data.mqtt.HiveMqttSource
+import io.jrb.labs.ingesterms.datafill.IngesterDatafill
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

@@ -21,15 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingester.messaging
+package io.jrb.labs.ingesterms.messaging
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.jrb.labs.commons.eventbus.SystemEventBus
 import io.jrb.labs.commons.logging.LoggerDelegate
 import io.jrb.labs.commons.service.ControllableService
 import io.jrb.labs.datatypes.Rtl433Data
-import io.jrb.labs.ingester.data.Source
-import io.jrb.labs.ingester.datafill.IngesterDatafill
+import io.jrb.labs.ingesterms.data.Source
+import io.jrb.labs.ingesterms.datafill.IngesterDatafill
 import io.jrb.labs.messages.RawMessageSource
 import io.jrb.labs.messages.Rtl433Message
 import org.springframework.cloud.stream.function.StreamBridge

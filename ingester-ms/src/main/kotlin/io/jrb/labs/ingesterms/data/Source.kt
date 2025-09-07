@@ -21,8 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingester.data
+package io.jrb.labs.ingesterms.data
 
-enum class SourceType {
-    MQTT
+import reactor.core.Disposable
+
+interface Source {
+
+    val name: String
+
+    val topic: String
+
+    val type: SourceType
+
+    fun connect()
+
+    fun disconnect()
+
+    fun subscribe(topic: String, handler: (String) -> Unit): Disposable
+
 }

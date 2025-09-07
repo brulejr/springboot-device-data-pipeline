@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingester.data.mqtt
+package io.jrb.labs.ingesterms.data.mqtt
 
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.datatypes.MqttQos
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient
-import io.jrb.labs.ingester.datafill.MqttSourceDatafill
-import io.jrb.labs.ingester.data.Source
-import io.jrb.labs.ingester.data.SourceType
+import io.jrb.labs.ingesterms.datafill.MqttSourceDatafill
+import io.jrb.labs.ingesterms.data.Source
+import io.jrb.labs.ingesterms.data.SourceType
 import reactor.core.Disposable
 import reactor.core.publisher.Flux
 
