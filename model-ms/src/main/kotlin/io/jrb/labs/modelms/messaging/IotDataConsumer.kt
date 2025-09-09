@@ -21,17 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingesterms
 
-import io.jrb.labs.ingesterms.datafill.IngesterDatafill
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.runApplication
+package io.jrb.labs.modelms.messaging
 
-@SpringBootApplication
-@EnableConfigurationProperties(IngesterDatafill::class)
-class IngesterMs
+import io.jrb.labs.commons.logging.LoggerDelegate
+import io.jrb.labs.messages.Rtl433Message
+import io.jrb.labs.modelms.service.ModelService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.springframework.stereotype.Component
+import java.util.function.Consumer
 
-fun main(args: Array<String>) {
-    runApplication<IngesterMs>(*args)
+@Component(value = "iotData")
+class IotDataConsumer(private val modelService: ModelService) : Consumer<Rtl433Message> {
+
+    private val log by LoggerDelegate()
+
+    private val scope = CoroutineScope(Dispatchers.Default)
+
+    override fun accept(message: Rtl433Message) {
+        log.info("message - {}", message)
+        scope.launch {
+            try {
+                modelService.processRawMessage(message)
+            } catch (ex: Exception) {
+                log.error("Error processing message {}", message, ex)
+            }
+        }
+    }
+
 }

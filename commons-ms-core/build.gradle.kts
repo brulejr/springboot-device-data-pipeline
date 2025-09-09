@@ -7,7 +7,10 @@ dependencies {
     implementation(platform(project(":dependency-bom")))
 
     api(project(":commons-core"))
+    api("io.projectreactor:reactor-core")
     api("org.springframework:spring-context")
+    api("org.springframework:spring-web")
+    api("org.springframework.data:spring-data-mongodb")
 
     testImplementation(project(":commons-core"))
     testImplementation(project(":commons-test"))

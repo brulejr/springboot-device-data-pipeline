@@ -1,7 +1,7 @@
-spring.application.name: ingester-ms
+spring.application.name: model-ms
 spring.profiles.active: ${PROFILE:local}
 
-server.port: ${SERVER_PORT:3041}
+server.port: ${SERVER_PORT:3042}
 
 info:
   app.name: ${spring.application.name}
@@ -25,20 +25,16 @@ management.info:
 logging.level:
   org.springframework: INFO
 
-application.ingester:
-  outbound-topic-binding: iotData-out-0
-
 spring.cloud.stream:
   default:
     binder: rabbit
     contentType: application/json
 
 spring.cloud.stream.bindings:
-  iotData-out-0:
+  iotData-in-0:
     destination: iot.data
 
 spring.cloud.stream.rabbit.bindings:
-  iotData-out-0:
-    producer:
-      exchangeType: topic
+  iotData-in-0:
+    consumer:
       autoBindDlq: false

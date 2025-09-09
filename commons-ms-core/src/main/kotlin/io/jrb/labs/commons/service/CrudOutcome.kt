@@ -21,17 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingesterms
+package io.jrb.labs.commons.service
 
-import io.jrb.labs.ingesterms.datafill.IngesterDatafill
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.runApplication
-
-@SpringBootApplication
-@EnableConfigurationProperties(IngesterDatafill::class)
-class IngesterMs
-
-fun main(args: Array<String>) {
-    runApplication<IngesterMs>(*args)
+sealed class CrudOutcome<out T> {
+    data class Success<T>(val data: T) : CrudOutcome<T>()
+    data class NotFound(val id: String) : CrudOutcome<Nothing>()
+    data class Conflict(val reason: String) : CrudOutcome<Nothing>()
+    data class Invalid(val reason: String) : CrudOutcome<Nothing>()
+    data class Error(val message: String, val cause: Throwable? = null) : CrudOutcome<Nothing>()
 }

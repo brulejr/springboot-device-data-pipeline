@@ -21,17 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingesterms
+package io.jrb.labs.modelms.model
 
-import io.jrb.labs.ingesterms.datafill.IngesterDatafill
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.runApplication
+import io.jrb.labs.datatypes.SensorType
+import io.jrb.labs.resources.model.SensorMappingResource
+import org.bson.codecs.pojo.annotations.BsonCreator
+import org.bson.codecs.pojo.annotations.BsonProperty
 
-@SpringBootApplication
-@EnableConfigurationProperties(IngesterDatafill::class)
-class IngesterMs
+data class SensorMapping @BsonCreator constructor(
+    @BsonProperty("name") val name: String,
+    @BsonProperty("type") val type: SensorType,
+    @BsonProperty("classname") val classname: String,
+    @BsonProperty("friendlyName") val friendlyName: String? = null
+) {
 
-fun main(args: Array<String>) {
-    runApplication<IngesterMs>(*args)
+    fun toSensorMappingResource(): SensorMappingResource {
+        return SensorMappingResource(
+            name = name,
+            type = type,
+            classname = classname,
+            friendlyName = friendlyName
+        )
+    }
+
 }

@@ -21,17 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingesterms
+package io.jrb.labs.modelms.resource
 
-import io.jrb.labs.ingesterms.datafill.IngesterDatafill
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.runApplication
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
+import io.jrb.labs.datatypes.SensorType
+import io.jrb.labs.modelms.model.SensorMapping
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 
-@SpringBootApplication
-@EnableConfigurationProperties(IngesterDatafill::class)
-class IngesterMs
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class SensorMappingRequest @JsonCreator constructor(
 
-fun main(args: Array<String>) {
-    runApplication<IngesterMs>(*args)
+    @field:NotBlank(message="Sensor name may not be blank")
+    @field:JsonProperty("name")
+    val name: String,
+
+    @field:NotNull(message="Sensor type is required")
+    @field:JsonProperty("type")
+    val type: SensorType,
+
+    @field:NotBlank(message="Sensor class may not be blank")
+    @field:JsonProperty("class")
+    val classname: String,
+
+    @field:JsonProperty("friendlyName")
+    val friendlyName: String? = null
+) {
+
+    fun toSensorMapping(): SensorMapping {
+        return SensorMapping(
+            name = name,
+            type = type,
+            classname = classname,
+            friendlyName = friendlyName
+        )
+    }
+
 }

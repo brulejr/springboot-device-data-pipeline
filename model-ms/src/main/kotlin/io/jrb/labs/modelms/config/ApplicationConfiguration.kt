@@ -21,17 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingesterms
+package io.jrb.labs.modelms.config
 
-import io.jrb.labs.ingesterms.datafill.IngesterDatafill
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.runApplication
+import io.jrb.labs.commons.eventbus.SystemEventBus
+import io.jrb.labs.commons.eventbus.SystemEventLogger
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
-@SpringBootApplication
-@EnableConfigurationProperties(IngesterDatafill::class)
-class IngesterMs
+@Configuration
+class ApplicationConfiguration {
 
-fun main(args: Array<String>) {
-    runApplication<IngesterMs>(*args)
+    @Bean
+    fun systemEventBus(): SystemEventBus = SystemEventBus()
+
+    @Bean
+    fun systemEventLogger(systemEventBus: SystemEventBus): SystemEventLogger = SystemEventLogger(systemEventBus)
+
 }

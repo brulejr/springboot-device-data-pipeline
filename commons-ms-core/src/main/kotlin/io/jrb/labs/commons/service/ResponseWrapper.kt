@@ -21,17 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingesterms
 
-import io.jrb.labs.ingesterms.datafill.IngesterDatafill
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.runApplication
+package io.jrb.labs.commons.service
 
-@SpringBootApplication
-@EnableConfigurationProperties(IngesterDatafill::class)
-class IngesterMs
+import org.springframework.http.HttpStatus
+import java.time.Instant
 
-fun main(args: Array<String>) {
-    runApplication<IngesterMs>(*args)
-}
+data class ResponseWrapper<T>(
+    val content: T? = null,
+    val status: Int = HttpStatus.OK.value(),
+    val timestamp: Instant = Instant.now(),
+    val messages: List<String> = listOf()
+)

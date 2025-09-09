@@ -21,17 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingesterms
+package io.jrb.labs.resources.model
 
-import io.jrb.labs.ingesterms.datafill.IngesterDatafill
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.runApplication
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonView
+import com.fasterxml.jackson.databind.JsonNode
+import io.jrb.labs.resources.ResourceViews
+import java.time.Instant
 
-@SpringBootApplication
-@EnableConfigurationProperties(IngesterDatafill::class)
-class IngesterMs
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class ModelResource(
 
-fun main(args: Array<String>) {
-    runApplication<IngesterMs>(*args)
-}
+    @field:JsonView(ResourceViews.List::class)
+    val source: String,
+
+    @field:JsonView(ResourceViews.List::class)
+    val model: String,
+
+    @field:JsonView(ResourceViews.List::class)
+    val category: String?,
+
+    @field:JsonView(ResourceViews.Details::class)
+    val jsonStructure: JsonNode,
+
+    @field:JsonView(ResourceViews.Details::class)
+    val fingerprint: String,
+
+    @field:JsonView(ResourceViews.Details::class)
+    val sensors: List<SensorMappingResource>? = null,
+
+    @field:JsonView(ResourceViews.Details::class)
+    val createdOn: Instant? = null,
+
+    @field:JsonView(ResourceViews.Details::class)
+    val modifiedOn: Instant? = null,
+
+    @field:JsonView(ResourceViews.Details::class)
+    val version: Long? = null
+
+)

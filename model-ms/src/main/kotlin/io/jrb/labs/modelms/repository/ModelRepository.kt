@@ -21,17 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingesterms
+package io.jrb.labs.modelms.repository
 
-import io.jrb.labs.ingesterms.datafill.IngesterDatafill
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.runApplication
+import io.jrb.labs.commons.repository.EntityRepository
+import io.jrb.labs.modelms.model.ModelEntity
+import org.springframework.stereotype.Repository
+import reactor.core.publisher.Mono
 
-@SpringBootApplication
-@EnableConfigurationProperties(IngesterDatafill::class)
-class IngesterMs
+@Repository
+interface ModelRepository : EntityRepository<ModelEntity> {
 
-fun main(args: Array<String>) {
-    runApplication<IngesterMs>(*args)
+    fun findByModel(model: String): Mono<ModelEntity>
+
 }

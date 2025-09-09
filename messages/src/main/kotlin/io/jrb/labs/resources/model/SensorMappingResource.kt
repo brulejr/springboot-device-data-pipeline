@@ -21,17 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.ingesterms
+package io.jrb.labs.resources.model
 
-import io.jrb.labs.ingesterms.datafill.IngesterDatafill
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.runApplication
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonView
+import io.jrb.labs.datatypes.SensorType
+import io.jrb.labs.resources.ResourceViews
 
-@SpringBootApplication
-@EnableConfigurationProperties(IngesterDatafill::class)
-class IngesterMs
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class SensorMappingResource(
 
-fun main(args: Array<String>) {
-    runApplication<IngesterMs>(*args)
-}
+    @field:JsonView(ResourceViews.Details::class)
+    val name: String,
+
+    @field:JsonView(ResourceViews.Details::class)
+    val type: SensorType,
+
+    @field:JsonView(ResourceViews.Details::class)
+    val classname: String,
+
+    @field:JsonView(ResourceViews.Details::class)
+    val friendlyName: String? = null
+
+)
