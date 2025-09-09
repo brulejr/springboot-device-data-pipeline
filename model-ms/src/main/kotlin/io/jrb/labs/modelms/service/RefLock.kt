@@ -21,16 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.modelms.repository
+package io.jrb.labs.modelms.service
 
-import io.jrb.labs.commons.repository.EntityRepository
-import io.jrb.labs.modelms.model.ModelEntity
-import org.springframework.stereotype.Repository
-import reactor.core.publisher.Mono
+import kotlinx.coroutines.sync.Mutex
+import java.util.concurrent.atomic.AtomicInteger
 
-@Repository
-interface ModelRepository : EntityRepository<ModelEntity> {
-
-    fun findByModelAndFingerprint(model: String, fingerprint: String): Mono<ModelEntity>
-
-}
+data class RefLock(val mutex: Mutex = Mutex(), val refCount: AtomicInteger = AtomicInteger(0))

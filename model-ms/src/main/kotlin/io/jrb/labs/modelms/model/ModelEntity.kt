@@ -29,7 +29,7 @@ import io.jrb.labs.resources.model.ModelResource
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
-@Document("model")
+@Document("models")
 data class ModelEntity(
     override val id: String? = null,
     override val guid: String? = null,

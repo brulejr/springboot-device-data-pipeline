@@ -39,10 +39,13 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/models")
 class ModelController(private val modelService: ModelService) {
 
-    @GetMapping("/{modelName}")
-    suspend fun getModel(@PathVariable modelName: String): ResponseEntity<ResponseWrapper<ModelResource>> {
+    @GetMapping("/{modelName}/{fingerprint}")
+    suspend fun getModel(
+        @PathVariable modelName: String,
+        @PathVariable fingerprint: String
+    ): ResponseEntity<ResponseWrapper<ModelResource>> {
         return crudResponse(
-            actionFn = { modelService.findModelResource(modelName) }
+            actionFn = { modelService.findModelResource(modelName, fingerprint) }
         )
     }
 
@@ -53,13 +56,14 @@ class ModelController(private val modelService: ModelService) {
         )
     }
 
-    @PutMapping("/{modelName}/sensors")
+    @PutMapping("/{modelName}/{fingerprint}/sensors")
     suspend fun updateSensors(
         @PathVariable modelName: String,
+        @PathVariable fingerprint: String,
         request: SensorsUpdateRequest
     ): ResponseEntity<ResponseWrapper<ModelResource>> {
         return crudResponse(
-            actionFn = { modelService.updateSensors(modelName, request) }
+            actionFn = { modelService.updateSensors(modelName, fingerprint, request) }
         )
     }
 

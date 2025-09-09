@@ -25,16 +25,38 @@ package io.jrb.labs.modelms.config
 
 import io.jrb.labs.commons.eventbus.SystemEventBus
 import io.jrb.labs.commons.eventbus.SystemEventLogger
+import io.jrb.labs.modelms.model.ModelEntity
+import jakarta.annotation.PostConstruct
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.domain.Sort
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate
+import org.springframework.data.mongodb.core.index.Index
+import org.springframework.data.mongodb.core.index.ReactiveIndexOperations
 
 @Configuration
-class ApplicationConfiguration {
+class ApplicationConfiguration(
+    private val mongoTemplate: ReactiveMongoTemplate
+) {
 
     @Bean
     fun systemEventBus(): SystemEventBus = SystemEventBus()
 
     @Bean
     fun systemEventLogger(systemEventBus: SystemEventBus): SystemEventLogger = SystemEventLogger(systemEventBus)
+
+    @PostConstruct
+    fun initIndexes() {
+        val indexOps: ReactiveIndexOperations = mongoTemplate.indexOps(ModelEntity::class.java)
+
+        val modelFingerprintIndex = Index()
+            .on("model", Sort.Direction.ASC)
+            .on("fingerprint", Sort.Direction.ASC)
+            .unique()
+
+        // trigger the reactive index creation (must subscribe)
+        indexOps.createIndex(modelFingerprintIndex)
+            .subscribe { idx -> println("✅ Ensured index created: $idx") }
+    }
 
 }
