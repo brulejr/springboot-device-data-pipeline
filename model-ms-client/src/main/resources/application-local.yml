@@ -1,0 +1,2 @@
+application.model-client:
+  base-url: http://localhost:3042

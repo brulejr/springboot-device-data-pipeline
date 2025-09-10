@@ -68,6 +68,13 @@ class ModelService(
         }
     }
 
+    suspend fun findModelResource(rtl433Message: Rtl433Message): CrudOutcome<ModelResource> {
+        val modelName = rtl433Message.payload.model
+        val jsonStructure = extractJsonStructure(rtl433Message)
+        val fingerprint = fingerprint(jsonStructure)
+        return findModelResource(modelName, fingerprint)
+    }
+
     suspend fun processRawMessage(rtl433Message: Rtl433Message): ModelResource {
         val modelName = rtl433Message.payload.model
         val jsonStructure = extractJsonStructure(rtl433Message)

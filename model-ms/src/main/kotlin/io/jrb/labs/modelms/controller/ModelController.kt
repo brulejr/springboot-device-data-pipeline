@@ -23,15 +23,18 @@
  */
 package io.jrb.labs.modelms.controller
 
+import io.jrb.labs.commons.client.ResponseWrapper
 import io.jrb.labs.commons.service.CrudResponse.Companion.crudResponse
-import io.jrb.labs.commons.service.ResponseWrapper
+import io.jrb.labs.messages.Rtl433Message
 import io.jrb.labs.modelms.resource.SensorsUpdateRequest
 import io.jrb.labs.modelms.service.ModelService
 import io.jrb.labs.resources.model.ModelResource
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -53,6 +56,13 @@ class ModelController(private val modelService: ModelService) {
     suspend fun retrieve(): ResponseEntity<ResponseWrapper<List<ModelResource>>> {
         return crudResponse(
             actionFn = { modelService.retrieveModelResources() }
+        )
+    }
+
+    @PostMapping("/search")
+    suspend fun search(@RequestBody rtl433Message: Rtl433Message): ResponseEntity<ResponseWrapper<ModelResource>> {
+        return crudResponse(
+            actionFn = { modelService.findModelResource(rtl433Message) }
         )
     }
 

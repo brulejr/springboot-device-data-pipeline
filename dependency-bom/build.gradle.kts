@@ -15,6 +15,8 @@ dependencies {
         api("org.slf4j:slf4j-api:2.0.17")
         api("org.springframework:spring-context:6.2.10")
         api("org.springframework:spring-web:6.2.10")
+        api("org.springframework:spring-webflux:6.2.10")
+        api("org.springframework.boot:spring-boot:2.5.4")
         api("org.springframework.boot:spring-boot-dependencies:2.5.4")
         api("org.springframework.data:spring-data-mongodb:4.5.3")
 

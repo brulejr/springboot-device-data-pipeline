@@ -22,14 +22,12 @@
  * SOFTWARE.
  */
 
-package io.jrb.labs.commons.service
+package io.jrb.labs.modelms.client
 
-import org.springframework.http.HttpStatus
-import java.time.Instant
+import io.jrb.labs.resources.model.ModelResource
 
-data class ResponseWrapper<T>(
-    val content: T? = null,
-    val status: Int = HttpStatus.OK.value(),
-    val timestamp: Instant = Instant.now(),
-    val messages: List<String> = listOf()
-)
+sealed class SearchResult {
+    data class Success(val model: ModelResource) : SearchResult()
+    object NotFound : SearchResult()
+    data class Error(val throwable: Throwable) : SearchResult()
+}

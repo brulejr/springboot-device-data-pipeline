@@ -23,6 +23,7 @@
  */
 package io.jrb.labs.commons.service
 
+import io.jrb.labs.commons.client.ResponseWrapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 

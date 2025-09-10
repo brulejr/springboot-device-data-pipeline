@@ -7,6 +7,8 @@ dependencies {
     implementation(platform(project(":dependency-bom")))
 
     api(project(":commons-core"))
+    api(project(":commons-ms-client"))
+
     api("io.projectreactor:reactor-core")
     api("org.springframework:spring-context")
     api("org.springframework:spring-web")
