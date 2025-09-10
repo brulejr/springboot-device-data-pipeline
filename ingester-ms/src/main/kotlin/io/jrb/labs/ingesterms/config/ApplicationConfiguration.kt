@@ -28,10 +28,12 @@ import io.jrb.labs.commons.eventbus.SystemEventLogger
 import io.jrb.labs.ingesterms.data.Source
 import io.jrb.labs.ingesterms.data.mqtt.HiveMqttSource
 import io.jrb.labs.ingesterms.datafill.IngesterDatafill
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
+@EnableConfigurationProperties(IngesterDatafill::class)
 class ApplicationConfiguration {
 
     @Bean
