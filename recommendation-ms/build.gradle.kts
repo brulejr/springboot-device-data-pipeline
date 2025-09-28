@@ -21,9 +21,19 @@ dependencyManagement {
 
 dependencies {
     implementation(platform(project(":dependency-bom")))
-    implementation(project(":commons-core"))
+
+    implementation(project(":commons-ms-core"))
     implementation(project(":messages"))
-    implementation("org.springframework.boot:spring-boot-starter")
+
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+    implementation("org.springframework.cloud:spring-cloud-starter-stream-rabbit")
+
+    implementation("io.github.reactivecircus.cache4k:cache4k:0.9.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 }
 
 kotlin {
