@@ -26,6 +26,7 @@ package io.jrb.labs.recommendationms.messaging
 
 import io.jrb.labs.commons.logging.LoggerDelegate
 import io.jrb.labs.messages.Rtl433Message
+import io.jrb.labs.recommendationms.datafill.RecommendationDatafill
 import io.jrb.labs.recommendationms.service.FingerprintService
 import io.jrb.labs.recommendationms.service.RecommendationService
 import io.jrb.labs.recommendationms.util.FingerprintUtil.fingerprintFor
@@ -42,15 +43,12 @@ import java.util.function.Consumer
 class IotDataConsumer(
     private val fingerprintService: FingerprintService,
     private val recommendationService: RecommendationService,
-    private val env: org.springframework.core.env.Environment
+    private val datafill: RecommendationDatafill
 ) : Consumer<Rtl433Message> {
 
     private val log by LoggerDelegate()
 
     private val scope = CoroutineScope(Dispatchers.Default)
-
-    private val bucketMinutes: Long = env.getProperty("app.fingerprint.bucket-duration-minutes", "60").toLong()
-
 
     override fun accept(message: Rtl433Message) {
         log.info("message - {}", message)
@@ -69,7 +67,7 @@ class IotDataConsumer(
         val fingerprint = fingerprintFor(payload.model, payload.id, payload.getProperties())
         val propSample = payload.getProperties()
 
-        return fingerprintService.registerObservation(fingerprint, now, bucketMinutes)
+        return fingerprintService.registerObservation(fingerprint, now, datafill.fingerprint.bucketDurationMinutes)
             .flatMap { bucketCount ->
                 recommendationService.maybeCreateRecommendation(fingerprint, payload.model, payload.id, bucketCount, propSample)
                     .flatMap { _ -> Mono.empty<Void>() }

@@ -23,9 +23,9 @@
  */
 package io.jrb.labs.recommendationms.service
 
+import io.jrb.labs.recommendationms.datafill.RecommendationDatafill
 import io.jrb.labs.recommendationms.model.Recommendation
 import io.jrb.labs.recommendationms.repository.RecommendationRepository
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import java.time.Instant
@@ -33,9 +33,8 @@ import java.time.Instant
 @Service
 class RecommendationService(
     private val recRepo: RecommendationRepository,
-    env: Environment
+    private val datafill: RecommendationDatafill
 ) {
-    private val threshold: Long = env.getProperty("app.recommendation.hourly-count-threshold", "100").toLong()
 
     fun maybeCreateRecommendation(
         fingerprint: String,
@@ -45,7 +44,7 @@ class RecommendationService(
         propertiesSample: Map<String, Any?>
     ): Mono<Recommendation?> {
 
-        if (bucketCount >= threshold) {
+        if (bucketCount >= datafill.hourlyCountThreshold) {
             val now = Instant.now()
             val rec = Recommendation(
                 id = null,

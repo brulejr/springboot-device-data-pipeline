@@ -21,22 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.recommendationms.datafill
+package io.jrb.labs.recommendationms.config
 
-import org.springframework.boot.context.properties.ConfigurationProperties
+import io.jrb.labs.commons.eventbus.SystemEventBus
+import io.jrb.labs.commons.eventbus.SystemEventLogger
+import io.jrb.labs.recommendationms.datafill.RecommendationDatafill
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 
-@ConfigurationProperties(prefix = "application.recommendation")
-data class RecommendationDatafill(
-    val hourlyCountThreshold: Long = 100,
-    val fingerprint: FingerprintDatafill = FingerprintDatafill(),
-    val dedupe: DedupeDatafill = DedupeDatafill()
-)
+@Configuration
+@EnableConfigurationProperties(RecommendationDatafill::class)
+class ApplicationConfiguration(
+    private val mongoTemplate: ReactiveMongoTemplate
+) {
 
-data class DedupeDatafill(
-    val cacheTtlSeconds: Long = 60,
-    val cacheMaxSize: Long = 1000
-)
+    @Bean
+    fun systemEventBus(): SystemEventBus = SystemEventBus()
 
-data class FingerprintDatafill(
-    val bucketDurationMinutes: Long = 60
-)
+    @Bean
+    fun systemEventLogger(systemEventBus: SystemEventBus): SystemEventLogger = SystemEventLogger(systemEventBus)
+
+}

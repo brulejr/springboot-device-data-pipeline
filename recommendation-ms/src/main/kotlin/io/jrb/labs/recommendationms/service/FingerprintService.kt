@@ -24,6 +24,7 @@
 package io.jrb.labs.recommendationms.service
 
 import io.github.reactivecircus.cache4k.Cache
+import io.jrb.labs.recommendationms.datafill.RecommendationDatafill
 import io.jrb.labs.recommendationms.model.FingerprintCount
 import io.jrb.labs.recommendationms.util.FingerprintUtil
 import kotlinx.coroutines.reactive.awaitFirstOrNull
@@ -40,20 +41,12 @@ import kotlin.time.toDuration
 @Service
 class FingerprintService(
     private val mongo: ReactiveMongoTemplate,
-    private val props: org.springframework.core.env.Environment
+    datafill: RecommendationDatafill
 ) {
 
-    private val cacheTtlSeconds: Long
-    private val cacheMaxSize: Long
-
-    init {
-        cacheTtlSeconds = props.getProperty("app.dedupe.cache-ttl-seconds", "60").toLong()
-        cacheMaxSize = props.getProperty("app.dedupe.cache-max-size", "10000").toLong()
-    }
-
     private val cache = Cache.Builder()
-        .expireAfterWrite(cacheTtlSeconds.toDuration(DurationUnit.SECONDS))
-        .maximumCacheSize(cacheMaxSize)
+        .expireAfterWrite(datafill.dedupe.cacheTtlSeconds.toDuration(DurationUnit.SECONDS))
+        .maximumCacheSize(datafill.dedupe.cacheMaxSize)
         .build<String, Boolean>()
 
     /**

@@ -39,13 +39,6 @@ spring.cloud.stream.rabbit.bindings:
     consumer:
       autoBindDlq: false
 
-# App-specific
-app:
-  dedupe:
-    cache-ttl-seconds: 60             # in-memory TTL to suppress frequent duplicate DB writes
-    cache-max-size: 10_000
+application.recommendation:
   fingerprint:
-    bucket-duration-minutes: 60       # per-hour windows (60 minutes)
-  recommendation:
-    hourly-count-threshold: 100      # sample: if fingerprint bucket count >= this -> recommend
-    min-unique-properties: 3
+    bucket-duration-minutes: 30       # per-hour windows (30 minutes)
