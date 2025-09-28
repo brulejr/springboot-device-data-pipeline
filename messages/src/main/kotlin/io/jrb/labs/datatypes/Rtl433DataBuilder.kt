@@ -33,11 +33,17 @@ class Rtl433DataBuilder {
     private var model: String? = null
     private var id: String? = null
     private var time: Instant = Instant.now()
+    private var name: String? = null
+    private var type: String? = null
+    private var area: String? = null
     private val properties: MutableMap<String, Any?> = mutableMapOf()
 
     fun model(model: String) = apply { this.model = model }
     fun id(id: String) = apply { this.id = id }
     fun time(time: Instant) = apply { this.time = time }
+    fun name(name: String?) = apply { this.name = name }
+    fun type(type: String?) = apply { this.type = type }
+    fun area(area: String?) = apply { this.area = area }
 
     @JsonAnySetter
     fun setProperty(key: String, value: Any?) = apply {
