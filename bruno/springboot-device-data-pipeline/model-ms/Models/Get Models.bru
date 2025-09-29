@@ -1,0 +1,15 @@
+meta {
+  name: Get Models
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{model_ms_url}}/api/v1/models
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

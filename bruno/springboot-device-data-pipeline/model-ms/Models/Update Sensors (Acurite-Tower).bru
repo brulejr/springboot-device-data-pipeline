@@ -1,0 +1,32 @@
+meta {
+  name: Update Sensors (Acurite-Tower)
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{model_ms_url}}/api/v1/models/:modelName/:fingerprint/sensors
+  body: json
+  auth: inherit
+}
+
+params:path {
+  modelName: Acurite-Tower
+  fingerprint: 036fcd77a3f795b7da5a3465299f562de5dc423ed8e06acc366e44f9c7d783f8
+}
+
+body:json {
+  {
+    "model": "Acurite-Tower",
+    "category": "weather",
+    "sensors": [
+      { "name": "battery_ok", "type": "BINARY", "class": "battery", "friendlyName": "battery" },
+      { "name": "temperature_C", "type": "ANALOG", "class": "temperature" },
+      { "name": "humidity", "type": "ANALOG", "class": "humidity" }
+    ]
+  }
+}
+
+settings {
+  encodeUrl: true
+}

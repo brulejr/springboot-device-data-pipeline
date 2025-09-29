@@ -1,0 +1,15 @@
+meta {
+  name: Get Recommendations
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{recommendation_ms_url}}/api/v1/recommendations/candidates
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
