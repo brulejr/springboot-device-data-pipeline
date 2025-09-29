@@ -26,24 +26,20 @@ package io.jrb.labs.recommendationms.messaging
 
 import io.jrb.labs.commons.logging.LoggerDelegate
 import io.jrb.labs.messages.Rtl433Message
-import io.jrb.labs.recommendationms.datafill.RecommendationDatafill
 import io.jrb.labs.recommendationms.service.FingerprintService
 import io.jrb.labs.recommendationms.service.RecommendationService
-import io.jrb.labs.recommendationms.util.FingerprintUtil.fingerprintFor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.awaitFirst
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
-import java.time.Instant
 import java.util.function.Consumer
 
 @Component(value = "iotData")
 class IotDataConsumer(
     private val fingerprintService: FingerprintService,
-    private val recommendationService: RecommendationService,
-    private val datafill: RecommendationDatafill
+    private val recommendationService: RecommendationService
 ) : Consumer<Rtl433Message> {
 
     private val log by LoggerDelegate()
@@ -63,12 +59,9 @@ class IotDataConsumer(
 
     private fun processMessage(msg: Rtl433Message): Mono<Void> {
         val payload = msg.payload
-        val now = Instant.now()
-        val fingerprint = fingerprintFor(payload.model, payload.id, payload.getProperties())
         val propSample = payload.getProperties()
-
-        return fingerprintService.registerObservation(fingerprint, now, datafill.fingerprint.bucketDurationMinutes)
-            .flatMap { bucketCount ->
+        return fingerprintService.registerObservation(payload)
+            .flatMap { (fingerprint, bucketCount) ->
                 recommendationService.maybeCreateRecommendation(fingerprint, payload.model, payload.id, bucketCount, propSample)
                     .flatMap { _ -> Mono.empty<Void>() }
                     .switchIfEmpty(Mono.empty())

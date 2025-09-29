@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
 
 @RestController
-@RequestMapping("/api/recommendations")
+@RequestMapping("/api/v1/recommendations")
 class RecommendationController(private val repository: RecommendationRepository) {
 
     @GetMapping("/candidates")
