@@ -40,5 +40,5 @@ spring.cloud.stream.rabbit.bindings:
       autoBindDlq: false
 
 application.recommendation:
-  fingerprint:
-    bucket-duration-minutes: 30       # per-hour windows (30 minutes)
+  bucket-duration-minutes: 30
+  bucket-count-threshold: 10

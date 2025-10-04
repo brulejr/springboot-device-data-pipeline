@@ -27,16 +27,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "application.recommendation")
 data class RecommendationDatafill(
-    val bucketCountThreshold: Long = 10,
-    val fingerprint: FingerprintDatafill = FingerprintDatafill(),
-    val dedupe: DedupeDatafill = DedupeDatafill()
-)
-
-data class DedupeDatafill(
-    val cacheTtlSeconds: Long = 60,
-    val cacheMaxSize: Long = 1000
-)
-
-data class FingerprintDatafill(
-    val bucketDurationMinutes: Long = 60
+    val bucketCountThreshold: Long = 30,
+    val bucketDurationMinutes: Long = 60,
+    val dedupeCacheTtlSeconds: Long = 60,
+    val dedupeCacheMaxSize: Long = 1000
 )

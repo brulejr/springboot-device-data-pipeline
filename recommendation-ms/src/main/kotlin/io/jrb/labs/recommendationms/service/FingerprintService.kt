@@ -54,8 +54,8 @@ class FingerprintService(
     private val mapper: ObjectMapper = jacksonObjectMapper()
 
     private val cache = Cache.Builder()
-        .expireAfterWrite(datafill.dedupe.cacheTtlSeconds.toDuration(DurationUnit.SECONDS))
-        .maximumCacheSize(datafill.dedupe.cacheMaxSize)
+        .expireAfterWrite(datafill.dedupeCacheTtlSeconds.toDuration(DurationUnit.SECONDS))
+        .maximumCacheSize(datafill.dedupeCacheMaxSize)
         .build<String, Boolean>()
 
     /**
@@ -67,7 +67,7 @@ class FingerprintService(
         val now = Instant.now()
         val fingerprint = fingerprintFor(data)
 
-        val bucketStart = bucketStartEpochMinutes(now, datafill.fingerprint.bucketDurationMinutes)
+        val bucketStart = bucketStartEpochMinutes(now, datafill.bucketDurationMinutes)
         val key = "$fingerprint#$bucketStart"
 
         // If seen recently in cache -> skip DB write and return current count from DB (non-blocking)
