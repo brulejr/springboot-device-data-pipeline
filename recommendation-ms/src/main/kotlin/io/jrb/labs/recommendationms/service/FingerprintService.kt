@@ -26,6 +26,7 @@ package io.jrb.labs.recommendationms.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.reactivecircus.cache4k.Cache
+import io.jrb.labs.commons.logging.LoggerDelegate
 import io.jrb.labs.datatypes.Rtl433Data
 import io.jrb.labs.recommendationms.datafill.RecommendationDatafill
 import io.jrb.labs.recommendationms.model.FingerprintCount
@@ -48,6 +49,7 @@ class FingerprintService(
     private val mongo: ReactiveMongoTemplate,
     private val datafill: RecommendationDatafill
 ) {
+    private val log by LoggerDelegate()
 
     private val mapper: ObjectMapper = jacksonObjectMapper()
 
@@ -95,6 +97,7 @@ class FingerprintService(
                     post?.count ?: 1L
                 }
             }
+            log.info("registerObservation - fingerprint='{}', bucketStart='{}', count='{}'", fingerprint, bucketStart, count)
             Pair(fingerprint, count)
         }
     }

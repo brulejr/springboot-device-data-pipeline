@@ -26,12 +26,13 @@ package io.jrb.labs.recommendationms.messaging
 
 import io.jrb.labs.commons.logging.LoggerDelegate
 import io.jrb.labs.messages.Rtl433Message
+import io.jrb.labs.recommendationms.model.Recommendation
 import io.jrb.labs.recommendationms.service.FingerprintService
 import io.jrb.labs.recommendationms.service.RecommendationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.util.function.Consumer
@@ -47,24 +48,22 @@ class IotDataConsumer(
     private val scope = CoroutineScope(Dispatchers.Default)
 
     override fun accept(message: Rtl433Message) {
-        log.info("message - {}", message)
+        log.debug("message - {}", message)
         scope.launch {
             try {
-                processMessage(message).awaitFirst()
+                processMessage(message).awaitSingleOrNull()
             } catch (ex: Exception) {
                 log.error("Error processing message {}", message, ex)
             }
         }
     }
 
-    private fun processMessage(msg: Rtl433Message): Mono<Void> {
+    private fun processMessage(msg: Rtl433Message): Mono<Recommendation> {
         val payload = msg.payload
         val propSample = payload.getProperties()
         return fingerprintService.registerObservation(payload)
             .flatMap { (fingerprint, bucketCount) ->
                 recommendationService.maybeCreateRecommendation(fingerprint, payload.model, payload.id, bucketCount, propSample)
-                    .flatMap { _ -> Mono.empty<Void>() }
-                    .switchIfEmpty(Mono.empty())
             }
     }
 

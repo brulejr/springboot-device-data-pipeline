@@ -44,7 +44,7 @@ class RecommendationService(
         propertiesSample: Map<String, Any?>
     ): Mono<Recommendation?> {
 
-        if (bucketCount >= datafill.hourlyCountThreshold) {
+        if (bucketCount >= datafill.bucketCountThreshold) {
             val now = Instant.now()
             val rec = Recommendation(
                 id = null,
