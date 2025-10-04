@@ -97,7 +97,7 @@ class FingerprintService(
                     post?.count ?: 1L
                 }
             }
-            log.info("registerObservation - fingerprint='{}', bucketStart='{}', count='{}'", fingerprint, bucketStart, count)
+            log.info("Observation -> fingerprint='{}', bucketStart='{}', count='{}'", fingerprint, bucketStart, count)
             Pair(fingerprint, count)
         }
     }

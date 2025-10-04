@@ -23,6 +23,7 @@
  */
 package io.jrb.labs.recommendationms.service
 
+import io.jrb.labs.commons.logging.LoggerDelegate
 import io.jrb.labs.recommendationms.datafill.RecommendationDatafill
 import io.jrb.labs.recommendationms.model.Recommendation
 import io.jrb.labs.recommendationms.repository.RecommendationRepository
@@ -35,6 +36,8 @@ class RecommendationService(
     private val recRepo: RecommendationRepository,
     private val datafill: RecommendationDatafill
 ) {
+
+    private val log by LoggerDelegate()
 
     fun maybeCreateRecommendation(
         fingerprint: String,
@@ -57,6 +60,7 @@ class RecommendationService(
                 propertiesSample = propertiesSample,
                 promoted = false
             )
+            log.info("Recommendation -> {}", rec)
             return recRepo.findByFingerprint(fingerprint)
                 .flatMap { existing ->
                     // update lastSeen and bucketCount if exists
