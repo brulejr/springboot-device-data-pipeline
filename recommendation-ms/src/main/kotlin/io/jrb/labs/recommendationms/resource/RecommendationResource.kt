@@ -21,20 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.recommendationms.model
+package io.jrb.labs.recommendationms.resource
 
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonView
+import io.jrb.labs.resources.ResourceViews
 
-@Document("fingerprint-counts")
-data class FingerprintCount(
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class RecommendationResource(
 
-    @Id val id: String? = null,   // composed key: "<fingerprint>#<bucketStartEpoch>"
+    @field:JsonView(ResourceViews.List::class)
+    val model: String,
 
-    val fingerprint: String,
+    @field:JsonView(ResourceViews.List::class)
+    val id: String,
 
-    val bucketStartEpoch: Long,    // epoch minutes or epoch seconds - consistent use required
-
-    val count: Long = 0
+    @field:JsonView(ResourceViews.List::class)
+    val bucketCount: Long
 
 )

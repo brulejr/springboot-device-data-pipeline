@@ -23,6 +23,7 @@
  */
 package io.jrb.labs.recommendationms.model
 
+import io.jrb.labs.recommendationms.resource.RecommendationResource
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
@@ -48,4 +49,14 @@ data class Recommendation(
 
     val promoted: Boolean = false
 
-)
+) {
+
+    fun toRecommendationResource(): RecommendationResource {
+        return RecommendationResource(
+            model = this.model,
+            id = this.deviceId,
+            bucketCount = this.bucketCount
+        )
+    }
+
+}

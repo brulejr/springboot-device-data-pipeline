@@ -23,8 +23,8 @@
  */
 package io.jrb.labs.recommendationms.api
 
-import io.jrb.labs.recommendationms.model.Recommendation
-import io.jrb.labs.recommendationms.repository.RecommendationRepository
+import io.jrb.labs.recommendationms.resource.RecommendationResource
+import io.jrb.labs.recommendationms.service.RecommendationService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -32,11 +32,11 @@ import reactor.core.publisher.Flux
 
 @RestController
 @RequestMapping("/api/v1/recommendations")
-class RecommendationController(private val repository: RecommendationRepository) {
+class RecommendationController(private val recommendationService: RecommendationService) {
 
     @GetMapping("/candidates")
-    fun listCandidates(): Flux<Recommendation> {
-        return repository.findAllByPromotedIsFalse()
+    fun listCandidates(): Flux<RecommendationResource> {
+        return recommendationService.listCandidates()
     }
 
 }

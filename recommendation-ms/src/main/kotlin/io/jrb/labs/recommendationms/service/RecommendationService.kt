@@ -27,8 +27,10 @@ import io.jrb.labs.commons.logging.LoggerDelegate
 import io.jrb.labs.recommendationms.datafill.RecommendationDatafill
 import io.jrb.labs.recommendationms.model.Recommendation
 import io.jrb.labs.recommendationms.repository.RecommendationRepository
+import io.jrb.labs.recommendationms.resource.RecommendationResource
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 import java.time.Instant
 
 @Service
@@ -68,6 +70,10 @@ class RecommendationService(
 
         log.info("Recommendation -> {}", recommendation)
         return repository.save(recommendation).awaitFirstOrNull()
+    }
+
+    fun listCandidates(): Flux<RecommendationResource> {
+        return repository.findAllByPromotedIsFalse().map { it.toRecommendationResource() }
     }
 
 }
