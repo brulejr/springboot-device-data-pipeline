@@ -31,13 +31,11 @@ import io.jrb.labs.datatypes.Rtl433Data
 import io.jrb.labs.recommendationms.datafill.RecommendationDatafill
 import io.jrb.labs.recommendationms.model.FingerprintCount
 import kotlinx.coroutines.reactive.awaitFirstOrNull
-import kotlinx.coroutines.reactor.mono
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.time.Instant
@@ -62,48 +60,36 @@ class FingerprintService(
      * Register a single observation. Returns the new bucket count (after increment).
      * Uses in-memory cache to suppress frequent DB writes for the same fingerprint within TTL.
      */
-    fun registerObservation(data: Rtl433Data): Mono<Pair<String, Long>> {
-
+    suspend fun registerObservation(data: Rtl433Data): Pair<String, Long> {
         val now = Instant.now()
         val fingerprint = fingerprintFor(data)
 
         val bucketStart = bucketStartEpochMinutes(now, datafill.bucketDurationMinutes)
         val key = "$fingerprint#$bucketStart"
 
-        // If seen recently in cache -> skip DB write and return current count from DB (non-blocking)
-        return mono {
-            val recent = cache.get(key)
-            val count = when (recent) {
-                true -> {
-                    // dupe: fetch current count from DB (no update)
-                    val existing = mongo.findById(key, FingerprintCount::class.java).awaitFirstOrNull()
-                    existing?.count ?: 0L
-                }
-                else -> {
-                    // non-dupe: mark in cache and upsert DB (atomic increment)
-                    cache.put(key, true)
-                    val q = Query.query(Criteria.where("_id").`is`(key))
-                    val update = Update()
-                        .inc("count", 1)
-                        .setOnInsert("fingerprint", fingerprint)
-                        .setOnInsert("bucketStartEpoch", bucketStart)
-
-                    // Use upsert
-                    mongo.upsert(q, update, FingerprintCount::class.java).awaitFirstOrNull()
-
-                    // fetch post-upsert value (atomic read)
-                    val post = mongo.findById(key, FingerprintCount::class.java).awaitFirstOrNull()
-                    val updateCount = post?.count ?: 1L
-
-                    log.info("Observation -> model = {}, id = {}, fingerprint='{}', bucketStart='{}', count='{}'",
-                        data.model, data.id, fingerprint, bucketStart, updateCount
-                    )
-
-                    updateCount
-                }
+        val cached = cache.get(key) ?: false
+        val count =  when (cached) {
+            true -> {
+                mongo.findById(key, FingerprintCount::class.java).awaitFirstOrNull()?.count ?: 0L
             }
-            Pair(fingerprint, count)
+            false -> {
+                cache.put(key, true)
+                val q = Query.query(Criteria.where("_id").`is`(key))
+                val update = Update()
+                    .inc("count", 1)
+                    .setOnInsert("fingerprint", fingerprint)
+                    .setOnInsert("bucketStartEpoch", bucketStart)
+
+                mongo.upsert(q, update, FingerprintCount::class.java).awaitFirstOrNull()
+                mongo.findById(key, FingerprintCount::class.java).awaitFirstOrNull()?.count ?: 1L
+            }
         }
+
+        log.info("Observation -> dupe = {}, model = {}, id = {}, fingerprint='{}', bucketStart='{}', count='{}'",
+            cached, data.model, data.id, fingerprint, bucketStart, count
+        )
+
+        return Pair(fingerprint, count)
     }
 
     fun bucketStartEpochMinutes(now: Instant, bucketMinutes: Long): Long {

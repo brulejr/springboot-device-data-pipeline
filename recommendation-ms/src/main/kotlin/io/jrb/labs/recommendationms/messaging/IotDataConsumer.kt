@@ -32,9 +32,7 @@ import io.jrb.labs.recommendationms.service.RecommendationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Mono
 import java.util.function.Consumer
 
 @Component(value = "iotData")
@@ -50,21 +48,28 @@ class IotDataConsumer(
     override fun accept(message: Rtl433Message) {
         log.debug("message - {}", message)
         scope.launch {
-            try {
-                processMessage(message).awaitSingleOrNull()
-            } catch (ex: Exception) {
-                log.error("Error processing message {}", message, ex)
-            }
+            processMessage(message)
         }
     }
 
-    private fun processMessage(msg: Rtl433Message): Mono<Recommendation> {
+    private suspend fun processMessage(msg: Rtl433Message): Recommendation? {
         val payload = msg.payload
-        val propSample = payload.getProperties()
-        return fingerprintService.registerObservation(payload)
-            .flatMap { (fingerprint, bucketCount) ->
-                recommendationService.maybeCreateRecommendation(fingerprint, payload.model, payload.id, bucketCount, propSample)
-            }
+        val deviceId = payload.id
+        val propertiesSample = payload.getProperties()
+
+        return try {
+            val (fingerprint, bucketCount) = fingerprintService.registerObservation(payload)
+            recommendationService.maybeCreateRecommendation(
+                fingerprint,
+                payload.model,
+                deviceId,
+                bucketCount,
+                propertiesSample
+            )
+        } catch (e: Exception) {
+            log.error("Error processing message $msg", e)
+            null
+        }
     }
 
 }

@@ -27,29 +27,32 @@ import io.jrb.labs.commons.logging.LoggerDelegate
 import io.jrb.labs.recommendationms.datafill.RecommendationDatafill
 import io.jrb.labs.recommendationms.model.Recommendation
 import io.jrb.labs.recommendationms.repository.RecommendationRepository
+import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
 import java.time.Instant
 
 @Service
 class RecommendationService(
-    private val recRepo: RecommendationRepository,
+    private val repository: RecommendationRepository,
     private val datafill: RecommendationDatafill
 ) {
 
     private val log by LoggerDelegate()
 
-    fun maybeCreateRecommendation(
+    suspend fun maybeCreateRecommendation(
         fingerprint: String,
         model: String,
         deviceId: String,
         bucketCount: Long,
         propertiesSample: Map<String, Any?>
-    ): Mono<Recommendation?> {
+    ): Recommendation? {
+        if (bucketCount < datafill.bucketCountThreshold) return null
 
-        if (bucketCount >= datafill.bucketCountThreshold) {
-            val now = Instant.now()
-            val rec = Recommendation(
+        val now = Instant.now()
+        val existing = repository.findByFingerprint(fingerprint).awaitFirstOrNull()
+
+        val recommendation = if (existing == null) {
+            Recommendation(
                 id = null,
                 fingerprint = fingerprint,
                 model = model,
@@ -57,19 +60,14 @@ class RecommendationService(
                 firstSeen = now,
                 lastSeen = now,
                 bucketCount = bucketCount,
-                propertiesSample = propertiesSample,
-                promoted = false
+                propertiesSample = propertiesSample
             )
-            log.info("Recommendation -> {}", rec)
-            return recRepo.findByFingerprint(fingerprint)
-                .flatMap { existing ->
-                    // update lastSeen and bucketCount if exists
-                    val updated = existing.copy(lastSeen = now, bucketCount = bucketCount)
-                    recRepo.save(updated)
-                }
-                .switchIfEmpty(recRepo.save(rec))
+        } else {
+            existing.copy(lastSeen = now, bucketCount = bucketCount)
         }
-        return Mono.justOrEmpty(null)
+
+        log.info("Recommendation -> {}", recommendation)
+        return repository.save(recommendation).awaitFirstOrNull()
     }
 
 }
