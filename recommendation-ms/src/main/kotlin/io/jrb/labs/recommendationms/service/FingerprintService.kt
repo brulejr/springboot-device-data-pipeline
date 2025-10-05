@@ -54,7 +54,7 @@ class FingerprintService(
     private val mapper: ObjectMapper = jacksonObjectMapper()
 
     private val cache = Cache.Builder()
-        .expireAfterWrite(datafill.dedupeCacheTtlSeconds.toDuration(DurationUnit.SECONDS))
+        .expireAfterWrite(datafill.dedupeCacheTtlMilliseconds.toDuration(DurationUnit.MILLISECONDS))
         .maximumCacheSize(datafill.dedupeCacheMaxSize)
         .build<String, Boolean>()
 
@@ -75,13 +75,12 @@ class FingerprintService(
             val recent = cache.get(key)
             val count = when (recent) {
                 true -> {
-                    // fetch current count from DB (no update)
-                    val q = Query.query(Criteria.where("_id").`is`(key))
+                    // dupe: fetch current count from DB (no update)
                     val existing = mongo.findById(key, FingerprintCount::class.java).awaitFirstOrNull()
                     existing?.count ?: 0L
                 }
                 else -> {
-                    // mark in cache and upsert DB (atomic increment)
+                    // non-dupe: mark in cache and upsert DB (atomic increment)
                     cache.put(key, true)
                     val q = Query.query(Criteria.where("_id").`is`(key))
                     val update = Update()
@@ -90,14 +89,19 @@ class FingerprintService(
                         .setOnInsert("bucketStartEpoch", bucketStart)
 
                     // Use upsert
-                    val result = mongo.upsert(q, update, FingerprintCount::class.java).awaitFirstOrNull()
+                    mongo.upsert(q, update, FingerprintCount::class.java).awaitFirstOrNull()
 
                     // fetch post-upsert value (atomic read)
                     val post = mongo.findById(key, FingerprintCount::class.java).awaitFirstOrNull()
-                    post?.count ?: 1L
+                    val updateCount = post?.count ?: 1L
+
+                    log.info("Observation -> model = {}, id = {}, fingerprint='{}', bucketStart='{}', count='{}'",
+                        data.model, data.id, fingerprint, bucketStart, updateCount
+                    )
+
+                    updateCount
                 }
             }
-            log.info("Observation -> fingerprint='{}', bucketStart='{}', count='{}'", fingerprint, bucketStart, count)
             Pair(fingerprint, count)
         }
     }

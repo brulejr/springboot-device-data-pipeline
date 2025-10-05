@@ -29,6 +29,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class RecommendationDatafill(
     val bucketCountThreshold: Long = 30,
     val bucketDurationMinutes: Long = 60,
-    val dedupeCacheTtlSeconds: Long = 60,
+    val dedupeCacheTtlMilliseconds: Long = 1000,
     val dedupeCacheMaxSize: Long = 1000
 )
