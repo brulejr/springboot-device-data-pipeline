@@ -1,0 +1,15 @@
+meta {
+  name: Info
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{recommendation_ms_url}}/mgmt/info
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

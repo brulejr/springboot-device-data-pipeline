@@ -21,42 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.datatypes
+package io.jrb.labs.recommendationms.model
 
-import com.fasterxml.jackson.annotation.JsonAnySetter
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
-@JsonPOJOBuilder(withPrefix = "")
-class Rtl433DataBuilder {
+@Document("recommendations")
+data class Recommendation(
 
-    private var model: String? = null
-    private var id: String? = null
-    private var time: Instant = Instant.now()
-    private var name: String? = null
-    private var type: String? = null
-    private var area: String? = null
-    private val properties: MutableMap<String, Any?> = mutableMapOf()
+    @Id val id: String? = null,
 
-    fun model(model: String) = apply { this.model = model }
-    fun id(id: String) = apply { this.id = id }
-    fun time(time: Instant) = apply { this.time = time }
-    fun name(name: String?) = apply { this.name = name }
-    fun type(type: String?) = apply { this.type = type }
-    fun area(area: String?) = apply { this.area = area }
+    val fingerprint: String,
 
-    @JsonAnySetter
-    fun setProperty(key: String, value: Any?) = apply {
-        properties[key] = value
-    }
+    val model: String,
 
-    fun build(): Rtl433Data {
-        return Rtl433Data(
-            model = requireNotNull(model),
-            id = requireNotNull(id),
-            time = time,
-            properties = properties.toMap()
-        )
-    }
+    val deviceId: String,
 
-}
+    val firstSeen: Instant,
+
+    val lastSeen: Instant,
+
+    val bucketCount: Long,
+
+    val propertiesSample: Map<String, Any?> = emptyMap(),
+
+    val promoted: Boolean = false
+
+)

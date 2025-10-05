@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "springboot-device-data-pipeline",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

@@ -1,0 +1,9 @@
+spring.data.mongodb:
+  uri: mongodb://admin:secret@localhost:27017/springboot-device-data-pipeline?authSource=admin
+
+spring.rabbitmq:
+  connection-timeout: 5s
+  host: localhost
+  username: admin
+  password: secret
+  port: 5672

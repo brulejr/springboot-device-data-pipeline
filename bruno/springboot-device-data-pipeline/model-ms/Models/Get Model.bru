@@ -1,0 +1,20 @@
+meta {
+  name: Get Model
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{model_ms_url}}/api/v1/models/:modelName/:fingerprint
+  body: none
+  auth: inherit
+}
+
+params:path {
+  modelName: Acurite-Tower
+  fingerprint: 036fcd77a3f795b7da5a3465299f562de5dc423ed8e06acc366e44f9c7d783f8
+}
+
+settings {
+  encodeUrl: true
+}
