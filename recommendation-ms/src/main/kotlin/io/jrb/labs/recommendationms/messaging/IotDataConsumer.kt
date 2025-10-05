@@ -29,47 +29,46 @@ import io.jrb.labs.messages.Rtl433Message
 import io.jrb.labs.recommendationms.model.Recommendation
 import io.jrb.labs.recommendationms.service.FingerprintService
 import io.jrb.labs.recommendationms.service.RecommendationService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
-import java.util.function.Consumer
 
-@Component(value = "iotData")
+@Component
 class IotDataConsumer(
     private val fingerprintService: FingerprintService,
     private val recommendationService: RecommendationService
-) : Consumer<Rtl433Message> {
+) {
 
     private val log by LoggerDelegate()
 
-    private val scope = CoroutineScope(Dispatchers.Default)
-
-    override fun accept(message: Rtl433Message) {
-        log.debug("message - {}", message)
-        scope.launch {
-            processMessage(message)
-        }
+    @Bean
+    fun iotData(): suspend (Flow<Rtl433Message>) -> Unit = { flow ->
+        flow.onEach { msg ->
+            try {
+                processMessage(msg)
+            } catch (e: Exception) {
+                log.error("Error processing message ${msg.id}", e)
+            }
+        }.collect()
     }
 
     private suspend fun processMessage(msg: Rtl433Message): Recommendation? {
+        log.debug("message - {}", msg)
         val payload = msg.payload
         val deviceId = payload.id
         val propertiesSample = payload.getProperties()
 
-        return try {
-            val (fingerprint, bucketCount) = fingerprintService.registerObservation(payload)
-            recommendationService.maybeCreateRecommendation(
-                fingerprint,
-                payload.model,
-                deviceId,
-                bucketCount,
-                propertiesSample
-            )
-        } catch (e: Exception) {
-            log.error("Error processing message $msg", e)
-            null
-        }
+        val (fingerprint, bucketCount) = fingerprintService.registerObservation(payload)
+
+        return recommendationService.maybeCreateRecommendation(
+            fingerprint = fingerprint,
+            model = payload.model,
+            deviceId = deviceId,
+            bucketCount = bucketCount,
+            propertiesSample = propertiesSample
+        )
     }
 
 }

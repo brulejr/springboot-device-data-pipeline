@@ -30,6 +30,8 @@ spring.cloud.stream:
     binder: rabbit
     contentType: application/json
 
+spring.cloud.function.definition: iotData
+
 spring.cloud.stream.bindings:
   iotData-in-0:
     destination: iot.data
