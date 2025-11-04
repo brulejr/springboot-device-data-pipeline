@@ -21,26 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.recommendationms.api
+package io.jrb.labs.recommendationms.repository
 
-import io.jrb.labs.commons.client.ResponseWrapper
-import io.jrb.labs.commons.service.CrudResponse.Companion.crudResponse
-import io.jrb.labs.recommendationms.resource.RecommendationResource
-import io.jrb.labs.recommendationms.service.RecommendationService
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import io.jrb.labs.recommendationms.model.KnownDevice
+import org.springframework.data.repository.reactive.ReactiveCrudRepository
+import reactor.core.publisher.Mono
 
-@RestController
-@RequestMapping("/api/v1/recommendations")
-class RecommendationController(private val recommendationService: RecommendationService) {
+interface KnownDeviceRepository : ReactiveCrudRepository<KnownDevice, String> {
 
-    @GetMapping("/candidates")
-    suspend fun listCandidates(): ResponseEntity<ResponseWrapper<List<RecommendationResource>>> {
-        return crudResponse(
-            actionFn = { recommendationService.listCandidates() }
-        )
-    }
+    fun findByModelAndDeviceId(model: String, deviceId: String): Mono<KnownDevice>
+
+    fun findByFingerprint(fingerprint: String): Mono<KnownDevice>
 
 }

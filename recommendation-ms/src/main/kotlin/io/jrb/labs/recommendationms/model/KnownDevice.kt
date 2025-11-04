@@ -23,40 +23,49 @@
  */
 package io.jrb.labs.recommendationms.model
 
-import io.jrb.labs.recommendationms.resource.RecommendationResource
+import io.jrb.labs.recommendationms.resource.KnownDeviceResource
+import io.jrb.labs.recommendationms.resource.PromotionRequest
+import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.annotation.Version
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
-@Document("recommendations")
-data class Recommendation(
-
-    @Id val id: String? = null,
-
-    val fingerprint: String,
-
-    val model: String,
-
+@Document("known-devices")
+data class KnownDevice(
+    @Id val documentId: String? = null,
     val deviceId: String,
-
-    val firstSeen: Instant,
-
-    val lastSeen: Instant,
-
-    val bucketCount: Long,
-
-    val propertiesSample: Map<String, Any?> = emptyMap(),
-
-    val promoted: Boolean = false
-
+    val model: String,
+    val fingerprint: String,
+    val name: String,
+    val type: String,
+    val area: String,
+    @CreatedDate val createdOn: Instant? = null,
+    @LastModifiedDate val modifiedOn: Instant? = null,
+    @Version val version: Int? = null
 ) {
 
-    fun toRecommendationResource(): RecommendationResource {
-        return RecommendationResource(
+    constructor(fingerprint: String, request: PromotionRequest) : this(
+        model = request.model,
+        deviceId = request.id,
+        fingerprint = fingerprint,
+        name = request.name,
+        type = request.type,
+        area = request.area
+    )
+
+    fun toKnownDeviceResource(): KnownDeviceResource {
+        return KnownDeviceResource(
             model = this.model,
-            id = this.deviceId,
+            deviceId = this.deviceId,
             fingerprint = this.fingerprint,
-            bucketCount = this.bucketCount
+            name = this.name,
+            type = this.type,
+            area = this.area,
+            createdOn = this.createdOn,
+            modifiedOn = this.modifiedOn,
+            version = this.version
         )
     }
 

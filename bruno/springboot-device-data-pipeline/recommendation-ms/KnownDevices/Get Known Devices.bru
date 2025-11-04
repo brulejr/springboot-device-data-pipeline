@@ -1,0 +1,15 @@
+meta {
+  name: Get Known Devices
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{recommendation_ms_url}}/api/v1/known-devices
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

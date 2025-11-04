@@ -21,26 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.recommendationms.api
+package io.jrb.labs.recommendationms.resource
 
-import io.jrb.labs.commons.client.ResponseWrapper
-import io.jrb.labs.commons.service.CrudResponse.Companion.crudResponse
-import io.jrb.labs.recommendationms.resource.RecommendationResource
-import io.jrb.labs.recommendationms.service.RecommendationService
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-@RestController
-@RequestMapping("/api/v1/recommendations")
-class RecommendationController(private val recommendationService: RecommendationService) {
-
-    @GetMapping("/candidates")
-    suspend fun listCandidates(): ResponseEntity<ResponseWrapper<List<RecommendationResource>>> {
-        return crudResponse(
-            actionFn = { recommendationService.listCandidates() }
-        )
-    }
-
-}
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class PromotionRequest(
+    val model: String,
+    val id: String,
+    val name: String,
+    val type: String,
+    val area: String
+)

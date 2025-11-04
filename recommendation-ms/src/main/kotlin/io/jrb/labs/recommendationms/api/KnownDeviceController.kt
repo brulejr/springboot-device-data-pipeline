@@ -25,21 +25,45 @@ package io.jrb.labs.recommendationms.api
 
 import io.jrb.labs.commons.client.ResponseWrapper
 import io.jrb.labs.commons.service.CrudResponse.Companion.crudResponse
-import io.jrb.labs.recommendationms.resource.RecommendationResource
+import io.jrb.labs.recommendationms.resource.KnownDeviceResource
+import io.jrb.labs.recommendationms.resource.PromotionRequest
+import io.jrb.labs.recommendationms.service.KnownDeviceService
 import io.jrb.labs.recommendationms.service.RecommendationService
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1/recommendations")
-class RecommendationController(private val recommendationService: RecommendationService) {
+@RequestMapping("/api/v1/known-devices")
+class KnownDeviceController(
+    private val knownDeviceService: KnownDeviceService,
+    private val recommendationService: RecommendationService
+) {
 
-    @GetMapping("/candidates")
-    suspend fun listCandidates(): ResponseEntity<ResponseWrapper<List<RecommendationResource>>> {
+    @PostMapping("/promote/{fingerprint}")
+    suspend fun promoteRecommendation(
+        @PathVariable fingerprint: String,
+        @RequestBody promotionRequest: PromotionRequest
+    ): ResponseEntity<KnownDeviceResource> {
+        // you’ll need a RecommendationRepository for this
+        val recommendation = recommendationService.findByFingerprint(fingerprint).awaitSingleOrNull()
+        if (recommendation != null) {
+            val promoted = knownDeviceService.promoteRecommendation(fingerprint, promotionRequest)
+            return ResponseEntity.ok(promoted)
+        } else {
+            return ResponseEntity.notFound().build()
+        }
+    }
+
+    @GetMapping
+    suspend fun listAll(): ResponseEntity<ResponseWrapper<List<KnownDeviceResource>>> {
         return crudResponse(
-            actionFn = { recommendationService.listCandidates() }
+            actionFn = { knownDeviceService.retrieveKnownDeviceResources() }
         )
     }
 

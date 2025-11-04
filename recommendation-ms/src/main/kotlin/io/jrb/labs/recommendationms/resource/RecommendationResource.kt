@@ -37,6 +37,9 @@ data class RecommendationResource(
     val id: String,
 
     @field:JsonView(ResourceViews.List::class)
+    val fingerprint: String,
+
+    @field:JsonView(ResourceViews.List::class)
     val bucketCount: Long
 
 )

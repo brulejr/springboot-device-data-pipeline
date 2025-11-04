@@ -1,0 +1,19 @@
+meta {
+  name: Promote Recommendation
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{recommendation_ms_url}}/api/v1/promote/:fingerprint
+  body: none
+  auth: inherit
+}
+
+params:path {
+  fingerprint: 
+}
+
+settings {
+  encodeUrl: true
+}

@@ -24,13 +24,15 @@
 package io.jrb.labs.recommendationms.service
 
 import io.jrb.labs.commons.logging.LoggerDelegate
+import io.jrb.labs.commons.service.CrudOutcome
 import io.jrb.labs.recommendationms.datafill.RecommendationDatafill
 import io.jrb.labs.recommendationms.model.Recommendation
 import io.jrb.labs.recommendationms.repository.RecommendationRepository
 import io.jrb.labs.recommendationms.resource.RecommendationResource
 import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import java.time.Instant
 
 @Service
@@ -72,8 +74,20 @@ class RecommendationService(
         return repository.save(recommendation).awaitFirstOrNull()
     }
 
-    fun listCandidates(): Flux<RecommendationResource> {
-        return repository.findAllByPromotedIsFalse().map { it.toRecommendationResource() }
+    fun findByFingerprint(fingerprint: String): Mono<Recommendation> {
+        return repository.findByFingerprint(fingerprint)
+    }
+
+    suspend fun listCandidates(): CrudOutcome<List<RecommendationResource>> {
+        return try {
+            val resources = repository.findAllByPromotedIsFalse()
+                .map { it.toRecommendationResource() }
+                .collectList()
+                .awaitSingleOrNull() ?: emptyList()
+            CrudOutcome.Success(resources)
+        } catch (e: Exception) {
+            CrudOutcome.Error("Failed to retrieve recommendation candidates", e)
+        }
     }
 
 }
