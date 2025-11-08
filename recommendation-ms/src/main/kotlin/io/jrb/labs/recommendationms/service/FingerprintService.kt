@@ -51,10 +51,10 @@ class FingerprintService(
 
     private val mapper: ObjectMapper = jacksonObjectMapper()
 
-    private val cache = Cache.Builder()
+    private val cache = Cache.Builder<String, Boolean>()
         .expireAfterWrite(datafill.dedupeCacheTtlMilliseconds.toDuration(DurationUnit.MILLISECONDS))
         .maximumCacheSize(datafill.dedupeCacheMaxSize)
-        .build<String, Boolean>()
+        .build()
 
     /**
      * Register a single observation. Returns the new bucket count (after increment).
