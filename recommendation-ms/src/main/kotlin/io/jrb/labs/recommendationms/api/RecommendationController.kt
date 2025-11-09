@@ -23,7 +23,7 @@
  */
 package io.jrb.labs.recommendationms.api
 
-import io.jrb.labs.commons.client.ResponseWrapper
+import io.jrb.labs.commons.client.ResourceWrapper
 import io.jrb.labs.commons.service.CrudResponse.Companion.crudResponse
 import io.jrb.labs.recommendationms.resource.RecommendationResource
 import io.jrb.labs.recommendationms.service.RecommendationService
@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController
 class RecommendationController(private val recommendationService: RecommendationService) {
 
     @GetMapping("/candidates")
-    suspend fun listCandidates(): ResponseEntity<ResponseWrapper<List<RecommendationResource>>> {
+    suspend fun listCandidates(): ResponseEntity<ResourceWrapper<List<RecommendationResource>>> {
         return crudResponse(
             actionFn = { recommendationService.listCandidates() }
         )

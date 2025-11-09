@@ -26,7 +26,7 @@ package io.jrb.labs.resources.model
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonView
 import com.fasterxml.jackson.databind.JsonNode
-import io.jrb.labs.resources.ResourceViews
+import io.jrb.labs.commons.client.ResourceViews
 import java.time.Instant
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -39,13 +39,15 @@ data class ModelResource(
     val model: String,
 
     @field:JsonView(ResourceViews.List::class)
+    val fingerprint: String,
+
+
+
+    @field:JsonView(ResourceViews.List::class)
     val category: String?,
 
     @field:JsonView(ResourceViews.Details::class)
     val jsonStructure: JsonNode,
-
-    @field:JsonView(ResourceViews.Details::class)
-    val fingerprint: String,
 
     @field:JsonView(ResourceViews.Details::class)
     val sensors: List<SensorMappingResource>? = null,

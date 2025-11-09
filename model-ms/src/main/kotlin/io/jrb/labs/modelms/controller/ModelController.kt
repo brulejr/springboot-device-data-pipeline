@@ -23,7 +23,9 @@
  */
 package io.jrb.labs.modelms.controller
 
-import io.jrb.labs.commons.client.ResponseWrapper
+import com.fasterxml.jackson.annotation.JsonView
+import io.jrb.labs.commons.client.ResourceViews
+import io.jrb.labs.commons.client.ResourceWrapper
 import io.jrb.labs.commons.service.CrudResponse.Companion.crudResponse
 import io.jrb.labs.messages.Rtl433Message
 import io.jrb.labs.modelms.resource.SensorsUpdateRequest
@@ -43,24 +45,26 @@ import org.springframework.web.bind.annotation.RestController
 class ModelController(private val modelService: ModelService) {
 
     @GetMapping("/{modelName}/{fingerprint}")
+    @JsonView(ResourceViews.Details::class)
     suspend fun getModel(
         @PathVariable modelName: String,
         @PathVariable fingerprint: String
-    ): ResponseEntity<ResponseWrapper<ModelResource>> {
+    ): ResponseEntity<ResourceWrapper<ModelResource>> {
         return crudResponse(
             actionFn = { modelService.findModelResource(modelName, fingerprint) }
         )
     }
 
     @GetMapping
-    suspend fun retrieve(): ResponseEntity<ResponseWrapper<List<ModelResource>>> {
+    @JsonView(ResourceViews.List::class)
+    suspend fun retrieve(): ResponseEntity<ResourceWrapper<List<ModelResource>>> {
         return crudResponse(
             actionFn = { modelService.retrieveModelResources() }
         )
     }
 
     @PostMapping("/search")
-    suspend fun search(@RequestBody rtl433Message: Rtl433Message): ResponseEntity<ResponseWrapper<ModelResource>> {
+    suspend fun search(@RequestBody rtl433Message: Rtl433Message): ResponseEntity<ResourceWrapper<ModelResource>> {
         return crudResponse(
             actionFn = { modelService.findModelResource(rtl433Message) }
         )
@@ -71,7 +75,7 @@ class ModelController(private val modelService: ModelService) {
         @PathVariable modelName: String,
         @PathVariable fingerprint: String,
         request: SensorsUpdateRequest
-    ): ResponseEntity<ResponseWrapper<ModelResource>> {
+    ): ResponseEntity<ResourceWrapper<ModelResource>> {
         return crudResponse(
             actionFn = { modelService.updateSensors(modelName, fingerprint, request) }
         )

@@ -23,7 +23,7 @@
  */
 package io.jrb.labs.commons.service
 
-import io.jrb.labs.commons.client.ResponseWrapper
+import io.jrb.labs.commons.client.ResourceWrapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
@@ -33,12 +33,12 @@ class CrudResponse {
 
         suspend fun <T> crudResponse(
             actionFn: suspend () -> CrudOutcome<T>,
-            successFn: (CrudOutcome.Success<T>) -> ResponseEntity<ResponseWrapper<T>> = { defaultSuccessFn(it) },
-            notFoundFn: (CrudOutcome.NotFound) -> ResponseEntity<ResponseWrapper<T>> = { defaultNotFoundFn(it) },
-            conflictFn: (CrudOutcome.Conflict) -> ResponseEntity<ResponseWrapper<T>> = { defaultConflictFn(it) },
-            invalidFn: (CrudOutcome.Invalid) -> ResponseEntity<ResponseWrapper<T>> = { defaultInvalidFn(it) },
-            errorFn: (CrudOutcome.Error) -> ResponseEntity<ResponseWrapper<T>> = { defaultErrorFn(it) }
-        ): ResponseEntity<ResponseWrapper<T>> {
+            successFn: (CrudOutcome.Success<T>) -> ResponseEntity<ResourceWrapper<T>> = { defaultSuccessFn(it) },
+            notFoundFn: (CrudOutcome.NotFound) -> ResponseEntity<ResourceWrapper<T>> = { defaultNotFoundFn(it) },
+            conflictFn: (CrudOutcome.Conflict) -> ResponseEntity<ResourceWrapper<T>> = { defaultConflictFn(it) },
+            invalidFn: (CrudOutcome.Invalid) -> ResponseEntity<ResourceWrapper<T>> = { defaultInvalidFn(it) },
+            errorFn: (CrudOutcome.Error) -> ResponseEntity<ResourceWrapper<T>> = { defaultErrorFn(it) }
+        ): ResponseEntity<ResourceWrapper<T>> {
             return when (val result = actionFn()) {
                 is CrudOutcome.Success -> successFn(result)
                 is CrudOutcome.NotFound -> notFoundFn(result)
@@ -49,37 +49,37 @@ class CrudResponse {
 
         }
 
-        private fun <T> defaultSuccessFn(result: CrudOutcome.Success<T>): ResponseEntity<ResponseWrapper<T>> {
-            return ResponseEntity.ok(ResponseWrapper(content = result.data))
+        private fun <T> defaultSuccessFn(result: CrudOutcome.Success<T>): ResponseEntity<ResourceWrapper<T>> {
+            return ResponseEntity.ok(ResourceWrapper(content = result.data))
         }
 
-        private fun <T> defaultNotFoundFn(result: CrudOutcome.NotFound): ResponseEntity<ResponseWrapper<T>> {
+        private fun <T> defaultNotFoundFn(result: CrudOutcome.NotFound): ResponseEntity<ResourceWrapper<T>> {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ResponseWrapper(
+                .body(ResourceWrapper(
                     status = HttpStatus.NOT_FOUND.value(),
                     messages = listOf("Unable to find resource: ${result.id}")
                 ))
         }
 
-        private fun <T> defaultConflictFn(result: CrudOutcome.Conflict): ResponseEntity<ResponseWrapper<T>> {
+        private fun <T> defaultConflictFn(result: CrudOutcome.Conflict): ResponseEntity<ResourceWrapper<T>> {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ResponseWrapper(
+                .body(ResourceWrapper(
                     status = HttpStatus.CONFLICT.value(),
                     messages = listOf(result.reason)
                 ))
         }
 
-        private fun <T> defaultInvalidFn(result: CrudOutcome.Invalid): ResponseEntity<ResponseWrapper<T>> {
+        private fun <T> defaultInvalidFn(result: CrudOutcome.Invalid): ResponseEntity<ResourceWrapper<T>> {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ResponseWrapper(
+                .body(ResourceWrapper(
                     status = HttpStatus.BAD_REQUEST.value(),
                     messages = listOf(result.reason)
                 ))
         }
 
-        private fun <T> defaultErrorFn(result: CrudOutcome.Error): ResponseEntity<ResponseWrapper<T>> {
+        private fun <T> defaultErrorFn(result: CrudOutcome.Error): ResponseEntity<ResourceWrapper<T>> {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ResponseWrapper(
+                .body(ResourceWrapper(
                     status = HttpStatus.BAD_REQUEST.value(),
                     messages = listOf(result.message)
                 ))

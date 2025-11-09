@@ -25,8 +25,8 @@ package io.jrb.labs.resources.model
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonView
+import io.jrb.labs.commons.client.ResourceViews
 import io.jrb.labs.datatypes.SensorType
-import io.jrb.labs.resources.ResourceViews
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class SensorMappingResource(

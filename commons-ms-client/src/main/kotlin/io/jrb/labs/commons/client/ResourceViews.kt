@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package io.jrb.labs.resources
+package io.jrb.labs.commons.client
 
-class ResourceViews {
+interface ResourceViews {
 
     interface List
     interface Details : List

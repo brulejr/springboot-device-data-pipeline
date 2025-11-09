@@ -23,7 +23,7 @@
  */
 package io.jrb.labs.modelms.client
 
-import io.jrb.labs.commons.client.ResponseWrapper
+import io.jrb.labs.commons.client.ResourceWrapper
 import io.jrb.labs.messages.Rtl433Message
 import io.jrb.labs.resources.model.ModelResource
 import org.springframework.http.HttpStatus
@@ -45,7 +45,7 @@ class ModelClient(
                 .awaitExchange { response ->
                     when (response.statusCode()) {
                         HttpStatus.OK -> {
-                            val wrapper = response.awaitBody<ResponseWrapper<ModelResource>>()
+                            val wrapper = response.awaitBody<ResourceWrapper<ModelResource>>()
                             SearchResult.Success(wrapper.content!!)
                         }
                         HttpStatus.NOT_FOUND -> SearchResult.NotFound

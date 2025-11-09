@@ -8,5 +8,6 @@ dependencies {
 
     implementation(project(":commons-core"))
 
+    api("com.fasterxml.jackson.core:jackson-databind")
     api("org.springframework:spring-web")
 }

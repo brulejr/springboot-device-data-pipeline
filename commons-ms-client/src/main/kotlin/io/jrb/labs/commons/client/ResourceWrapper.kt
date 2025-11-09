@@ -23,12 +23,22 @@
  */
 package io.jrb.labs.commons.client
 
+import com.fasterxml.jackson.annotation.JsonView
 import org.springframework.http.HttpStatus
 import java.time.Instant
 
-data class ResponseWrapper<T>(
+data class ResourceWrapper<T>(
+
+    @field:JsonView(ResourceViews.List::class)
     val content: T? = null,
+
+    @field:JsonView(ResourceViews.List::class)
     val status: Int = HttpStatus.OK.value(),
+
+    @field:JsonView(ResourceViews.List::class)
     val timestamp: Instant = Instant.now(),
+
+    @field:JsonView(ResourceViews.List::class)
     val messages: List<String> = listOf()
+
 )

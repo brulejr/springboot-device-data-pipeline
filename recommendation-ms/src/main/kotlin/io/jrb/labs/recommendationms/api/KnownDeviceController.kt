@@ -23,7 +23,7 @@
  */
 package io.jrb.labs.recommendationms.api
 
-import io.jrb.labs.commons.client.ResponseWrapper
+import io.jrb.labs.commons.client.ResourceWrapper
 import io.jrb.labs.commons.service.CrudResponse.Companion.crudResponse
 import io.jrb.labs.recommendationms.resource.KnownDeviceResource
 import io.jrb.labs.recommendationms.resource.PromotionRequest
@@ -61,7 +61,7 @@ class KnownDeviceController(
     }
 
     @GetMapping
-    suspend fun listAll(): ResponseEntity<ResponseWrapper<List<KnownDeviceResource>>> {
+    suspend fun listAll(): ResponseEntity<ResourceWrapper<List<KnownDeviceResource>>> {
         return crudResponse(
             actionFn = { knownDeviceService.retrieveKnownDeviceResources() }
         )

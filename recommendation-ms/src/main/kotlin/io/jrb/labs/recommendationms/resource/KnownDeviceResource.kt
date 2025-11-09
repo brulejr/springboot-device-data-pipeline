@@ -25,7 +25,7 @@ package io.jrb.labs.recommendationms.resource
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonView
-import io.jrb.labs.resources.ResourceViews
+import io.jrb.labs.commons.client.ResourceViews
 import java.time.Instant
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
