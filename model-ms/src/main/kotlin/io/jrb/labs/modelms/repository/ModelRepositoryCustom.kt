@@ -21,16 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package io.jrb.labs.modelms.repository
 
-import io.jrb.labs.commons.repository.EntityRepository
 import io.jrb.labs.modelms.model.ModelEntity
-import org.springframework.stereotype.Repository
-import reactor.core.publisher.Mono
+import io.jrb.labs.resources.model.Rtl433Search
+import reactor.core.publisher.Flux
 
-@Repository
-interface ModelRepository : EntityRepository<ModelEntity>, ModelRepositoryCustom {
-
-    fun findByModelAndFingerprint(model: String, fingerprint: String): Mono<ModelEntity>
-
+interface ModelRepositoryCustom {
+    fun search(search: Rtl433Search): Flux<ModelEntity>
 }

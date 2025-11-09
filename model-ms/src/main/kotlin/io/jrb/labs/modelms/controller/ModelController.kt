@@ -27,10 +27,10 @@ import com.fasterxml.jackson.annotation.JsonView
 import io.jrb.labs.commons.client.ResourceViews
 import io.jrb.labs.commons.client.ResourceWrapper
 import io.jrb.labs.commons.service.CrudResponse.Companion.crudResponse
-import io.jrb.labs.messages.Rtl433Message
 import io.jrb.labs.modelms.resource.SensorsUpdateRequest
 import io.jrb.labs.modelms.service.ModelService
 import io.jrb.labs.resources.model.ModelResource
+import io.jrb.labs.resources.model.Rtl433Search
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -64,9 +64,10 @@ class ModelController(private val modelService: ModelService) {
     }
 
     @PostMapping("/search")
-    suspend fun search(@RequestBody rtl433Message: Rtl433Message): ResponseEntity<ResourceWrapper<ModelResource>> {
+    @JsonView(ResourceViews.List::class)
+    suspend fun search(@RequestBody rtl433Search: Rtl433Search): ResponseEntity<ResourceWrapper<List<ModelResource>>> {
         return crudResponse(
-            actionFn = { modelService.findModelResource(rtl433Message) }
+            actionFn = { modelService.searchModelResources(rtl433Search) }
         )
     }
 

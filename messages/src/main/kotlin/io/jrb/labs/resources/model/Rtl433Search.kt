@@ -21,16 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.jrb.labs.modelms.repository
+package io.jrb.labs.resources.model
 
-import io.jrb.labs.commons.repository.EntityRepository
-import io.jrb.labs.modelms.model.ModelEntity
-import org.springframework.stereotype.Repository
-import reactor.core.publisher.Mono
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Repository
-interface ModelRepository : EntityRepository<ModelEntity>, ModelRepositoryCustom {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Rtl433Search @JsonCreator constructor (
 
-    fun findByModelAndFingerprint(model: String, fingerprint: String): Mono<ModelEntity>
+    @field:JsonProperty("model")
+    val model: String?,
 
-}
+    @field:JsonProperty("id")
+    val id: String?,
+
+    @field:JsonProperty("name")
+    val name: String?,
+
+    @field:JsonProperty("type")
+    val type: String?,
+
+    @field:JsonProperty("area")
+    val area: String?
+
+) {}

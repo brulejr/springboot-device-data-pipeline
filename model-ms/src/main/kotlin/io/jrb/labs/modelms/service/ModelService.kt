@@ -34,6 +34,7 @@ import io.jrb.labs.modelms.model.ModelEntity
 import io.jrb.labs.modelms.repository.ModelRepository
 import io.jrb.labs.modelms.resource.SensorsUpdateRequest
 import io.jrb.labs.resources.model.ModelResource
+import io.jrb.labs.resources.model.Rtl433Search
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -68,11 +69,16 @@ class ModelService(
         }
     }
 
-    suspend fun findModelResource(rtl433Message: Rtl433Message): CrudOutcome<ModelResource> {
-        val modelName = rtl433Message.payload.model
-        val jsonStructure = extractJsonStructure(rtl433Message)
-        val fingerprint = fingerprint(jsonStructure)
-        return findModelResource(modelName, fingerprint)
+    suspend fun searchModelResources(rtl433Search: Rtl433Search): CrudOutcome<List<ModelResource>> {
+        return try {
+            val resources = modelRepository.search(rtl433Search)
+                .map { it.toModelResource(objectMapper) }
+                .collectList()
+                .awaitSingleOrNull() ?: emptyList()
+            CrudOutcome.Success(resources)
+        } catch (e: Exception) {
+            CrudOutcome.Error("Failed to search model resources", e)
+        }
     }
 
     suspend fun processRawMessage(rtl433Message: Rtl433Message): ModelResource {
