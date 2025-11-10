@@ -35,7 +35,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -71,11 +70,11 @@ class ModelController(private val modelService: ModelService) {
         )
     }
 
-    @PutMapping("/{modelName}/{fingerprint}/sensors")
+    @PostMapping("/{modelName}/{fingerprint}/sensors")
     suspend fun updateSensors(
         @PathVariable modelName: String,
         @PathVariable fingerprint: String,
-        request: SensorsUpdateRequest
+        @RequestBody request: SensorsUpdateRequest
     ): ResponseEntity<ResourceWrapper<ModelResource>> {
         return crudResponse(
             actionFn = { modelService.updateSensors(modelName, fingerprint, request) }
